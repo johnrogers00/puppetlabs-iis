@@ -238,4 +238,43 @@ describe 'iis_application' do
       it { expect { iis_application_type }.to raise_error(Puppet::ResourceError, %r{Invalid protocol 'woot'. Valid values are http, https, net.pipe, net.tcp, net.msmq, msmq.formatname}) }
     end
   end
+  describe 'parameter :preloadenabled' do
+    context 'when blank' do
+      let(:params) do
+        {
+          title: 'foo\bar',
+          preloadenabled: '',
+        }
+      end
+      it { expect { iis_application_type }.to raise_error(Puppet::ResourceError, %r{Invalid value "". Valid values are true, false.}) }
+    end
+    context 'when true' do
+      let(:params) do
+        {
+          title: 'foo\bar',
+          preloadenabled: 'true',
+        }
+      end
+      it { expect(iis_application_type[:preloadenabled]).to eq :true}
+    end
+    context 'when false' do
+      let(:params) do
+        {
+          title: 'foo\bar',
+          preloadenabled: 'false',
+        }
+      end
+      it { expect(iis_application_type[:preloadenabled]).to eq :false }
+    end
+    context 'when non boolean' do
+      let(:params) do
+        {
+          title: 'foo\bar',
+          preloadenabled: 'whatever',
+        }
+      end
+      it { expect { iis_application_type }.to raise_error(Puppet::ResourceError, %r{Invalid value "whatever". Valid values are true, false.}) }
+    end
+  end
+
 end

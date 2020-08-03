@@ -47,6 +47,10 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
     @property_flush[:applicationpool] = value
   end
 
+  def preloadenabled=(value)
+    @property_flush[:preloadenabled] = value
+  end
+
   def create
     check_paths
     if @resource[:virtual_directory]
@@ -104,6 +108,10 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
       inst_cmd << "Set-ItemProperty -Path 'IIS:/Sites/#{self.class.find_sitename(resource)}/#{app_name}' -Name applicationPool -Value '#{resource[:applicationpool]}'"
     end
 
+    if @property_flush[:preloadenabled]
+      inst_cmd << "Set-ItemProperty -Path 'IIS:/Sites/#{self.class.find_sitename(resource)}/#{app_name}' -Name preloadEnabled -Value '#{@property_flush[:preloadenabled]}'"
+    end
+
     inst_cmd = inst_cmd.join("\n")
     result   = self.class.run(inst_cmd)
     raise "Error updating application: #{result[:errormessage]}" unless (result[:exitcode]).zero?
@@ -140,6 +148,7 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
       app_hash[:sslflags]           = app['sslflags']
       app_hash[:authenticationinfo] = app['authenticationinfo']
       app_hash[:enabledprotocols]   = app['enabledprotocols']
+      app_hash[:preloadenabled]     = app['preloadenabled']
 
       new(app_hash)
     end

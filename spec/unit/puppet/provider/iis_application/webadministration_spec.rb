@@ -87,4 +87,24 @@ describe 'iis_application provider' do
       iis_application_provider.update
     end
   end
+  describe 'updating preloadenabled' do
+    let(:params) do
+      {
+        title: 'foo\bar',
+      }
+    end
+
+    before :each do
+      cmdtext = "$webApplication = Get-WebApplication -Site 'foo' -Name 'bar'"
+      cmdtext += "\n"
+      cmdtext += "Set-ItemProperty -Path 'IIS:/Sites/foo/bar' -Name preloadEnabled -Value 'true'"
+      allow(Puppet::Provider::IIS_PowerShell).to receive(:run) \
+        .with(cmdtext) \
+        .and_return(exitcode: 0)
+    end
+    it 'updates value' do
+      iis_application_provider.preloadenabled = :true
+      iis_application_provider.update
+    end
+  end
 end

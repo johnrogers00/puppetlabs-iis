@@ -22,5 +22,7 @@ Get-WebApplication | % {
       windows                     = [bool](Get-WebConfiguration -Location "${site}/${name}" -Filter "system.webserver/security/authentication/windowsAuthentication").enabled
     }
     enabledprotocols = [string]$_.enabledProtocols
+    preloadenabled   = [string](Get-WebApplication -site "${site}" -name "${name}").preloadEnabled
+
   }
 } | ConvertTo-Json -Depth 10

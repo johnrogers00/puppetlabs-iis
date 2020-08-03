@@ -101,6 +101,28 @@ Puppet::Type.newtype(:iis_application) do
     end
   end
 
+  newproperty(:preloadenabled, boolean: true) do
+    desc 'Enables loading application automatically without a client request first.  If all applications in the site require this, it can set on the entire site using the iis_site resource.  Setting this value on the application level is support on Windows 2012 R2 and higher.'
+    newvalue(:true)
+    newvalue(:false)
+
+    munge do |value|
+      resource.munge_boolean(value)
+    end
+  end
+
   autorequire(:iis_application_pool) { self[:applicationpool] }
   autorequire(:iis_site) { self[:sitename] }
+
+  def munge_boolean(value)
+    case value
+    when true, 'true', :true
+      :true
+    when false, 'false', :false
+      :false
+    else
+      raise('munge_boolean only takes booleans')
+    end
+  end
+
 end
